@@ -1,0 +1,8 @@
+# 環境変数
+.env
+
+# google api
+keys.json
+
+# node_modules
+/node_modules
