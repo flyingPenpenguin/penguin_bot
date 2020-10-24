@@ -200,16 +200,17 @@ discordClient.on('message', async msg => {
                     console.log('Connected!');
 
                     // 書き込み位置取得function
-                    // getStartingCellByUserId(gsapi, msg.author.username).then((item) => {
-                    //     let startingNumber = item;
-                    // }).catch((e) => {
-                    //     console.log(e);
-                    // });
-                    const promise1 = Promise.resolve(getStartingCellByUserId(gsapi, msg.author.username));
+                    const startingNumPromise = Promise.resolve(getStartingCellByUserId(gsapi, msg.author.username));
 
-                    promise1.then((startingNumber) => {
+                    // 書き込み開始位置取得が成功したら書き込みを行う(例外処理ないけどね！)
+                    startingNumPromise.then((startingNumber) => {
                         // 全入力functionの呼び出し
                         inputAttendanceBatch(gsapi, msgContent, startingNumber);
+
+                        msg.channel.send(
+                            msg.author.username + 'さん、参加登録を受け付けました！・ｗ・\n' +
+                            '記入ありがとですー・ｗ・/'
+                        );
                     });
 
                 }); // case 2おわり
@@ -220,19 +221,20 @@ discordClient.on('message', async msg => {
 /**
  * 拠点参加予定日すべてに一括入力する
  */
-async function inputAttendanceBatch(gsapi, uInput) {
-
-    // ユーザーによって書き込み位置が違うため、ユーザー名から書き込み開始位置を取得する必要がある
+async function inputAttendanceBatch(gsapi, uInput, startingNumber) {
 
     // リクエストに添うように配列化
     let updateValues = [uInput];
+
+    // 5行目から開始なので
+    startingNumber = startingNumber + 5;
 
     // 書き換えオプション
     const updateOptions = {
         // スプレッドシートのID(タブの名前ではない)
         spreadsheetId: Env.TEST_SPREADSHEET_ID,
         // 書き込むタブ(シート)と位置の指定
-        range: Env.ATTENDANCE_SHEET_NAME + '!F5',
+        range: Env.ATTENDANCE_SHEET_NAME + '!F' + startingNumber,
         valueInputOption: 'USER_ENTERED',
         resource: {
             values: updateValues
