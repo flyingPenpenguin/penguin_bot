@@ -57,6 +57,9 @@ discordClient.on('message', async msg => {
     // bot自身の発言は無視
     if (msg.author.bot) return;
 
+    console.log(msg.author.username);
+
+
     // '拠点'で始まるメッセージをピック
     if (msg.content.startsWith('拠点')) {
 
@@ -139,7 +142,7 @@ discordClient.on('message', async msg => {
                     inputAttendanceSpecified(googleClient, msgContent);
                 });
 
-                break;
+                break; // case 1おわり
 
             /**
              * 全入力モード
@@ -187,27 +190,39 @@ discordClient.on('message', async msg => {
                         return;
                     }
 
+                    // シートAPIの定義
+                    const gsapi = google.sheets({
+                        version:'v4',
+                        auth: googleClient
+                    });
+
                     // 接続完了
                     console.log('Connected!');
 
-                    // 全入力functionの呼び出し
-                    inputAttendanceBatch(googleClient, msgContent);
-                });
+                    // 書き込み位置取得function
+                    // getStartingCellByUserId(gsapi, msg.author.username).then((item) => {
+                    //     let startingNumber = item;
+                    // }).catch((e) => {
+                    //     console.log(e);
+                    // });
+                    const promise1 = Promise.resolve(getStartingCellByUserId(gsapi, msg.author.username));
 
-                break;
-        }
+                    promise1.then((startingNumber) => {
+                        // 全入力functionの呼び出し
+                        inputAttendanceBatch(gsapi, msgContent, startingNumber);
+                    });
+
+                }); // case 2おわり
+        } // switchおわり
     }
 });
 
 /**
  * 拠点参加予定日すべてに一括入力する
  */
-async function inputAttendanceBatch(gClient, uInput) {
-    // シートAPIの定義
-    const gsapi = google.sheets({
-        version:'v4',
-        auth: gClient
-    });
+async function inputAttendanceBatch(gsapi, uInput) {
+
+    // ユーザーによって書き込み位置が違うため、ユーザー名から書き込み開始位置を取得する必要がある
 
     // リクエストに添うように配列化
     let updateValues = [uInput];
@@ -229,6 +244,53 @@ async function inputAttendanceBatch(gClient, uInput) {
 
     // 結果をコンソールに出力
     console.log(res);
+}
+
+/**
+ * 参加情報書き込み位置を取得する
+ */
+async function getStartingCellByUserId(gsapi, userName) {
+
+    /**
+     * 発言ユーザーの家名取得
+     */
+    // 家名取得のためのオプション
+    const optForIndexing = {
+        spreadsheetId: Env.TEST_SPREADSHEET_ID,
+        range: Env.DISCORD_USER_NAME_SHEET_NAME + '!B5:C'
+    };
+
+    // 家名リストの元データ取得
+    let inGameNames = await gsapi.spreadsheets.values.get(optForIndexing);
+    // 家名リスト抽出
+    inGameNames = inGameNames.data.values;
+
+    let targetFamilyName = '';
+
+    // 発言ユーザーの家名をtargetFamilyNameに代入
+    inGameNames.some(function (element) {
+        if (element[1] == userName) {
+            targetFamilyName = element[0];
+            return true;
+        }
+    });
+
+    /**
+     * 家名から書き込み位置の計算
+     */
+    // 出欠確認シートは並びが変わっている場合があるため現在の並びを取得する
+    const optForGettingStartingNumber = {
+        spreadsheetId: Env.TEST_SPREADSHEET_ID,
+        range: Env.ATTENDANCE_SHEET_NAME + '!B5:B'
+    };
+
+    // 出欠確認シートの家名リストの元データ取得
+    let familyNamesOrder = await gsapi.spreadsheets.values.get(optForGettingStartingNumber);
+    // 出欠確認シートの家名リスト抽出
+    familyNamesOrder = familyNamesOrder.data.values.flat();
+
+    // 取得開始位置(デフォルト5に加算する数値)
+    return familyNamesOrder.indexOf(targetFamilyName);
 }
 
 
