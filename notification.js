@@ -15,7 +15,7 @@ const client = new Discord.Client();
 const token = Env.DISCORD_TOKEN;
 
 /**
- * ログイン処理
+ * 処理を行う
  */
 // ログイン
 client.login(token);
@@ -24,5 +24,17 @@ client.login(token);
 client.on('ready', () => {
     console.log(`${client.user.username}でログイン成功しました。`);
 
-    client.channels.cache.get(Env.DISCORD_NODE_NOTIFICATION_CHANNEL_ID).send('@everyone\n本日は拠点戦です！・ｗ・\n出欠シートへの記入がまだの方は記入よろしくお願いします・ｗ・/');
+    let notificationResult = Promise.resolve(sendNotification());
+
+    // チャンネルにメッセージを送信したらログアウト
+    notificationResult.then(() => {
+        client.destroy();
+    });
 });
+
+/**
+ * ログイン >> 通知 >> ログアウト
+ */
+async function sendNotification() {
+    return await client.channels.cache.get(Env.DISCORD_NODE_NOTIFICATION_CHANNEL_ID).send('@everyone\n本日は拠点戦です！・ｗ・\n出欠シートへの記入がまだの方は記入よろしくお願いします・ｗ・/');
+}

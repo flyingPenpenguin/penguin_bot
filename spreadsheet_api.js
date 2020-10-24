@@ -1,3 +1,9 @@
+/**
+ * References
+ */
+// Google Sheets API - JavaScript NodeJS Tutorial
+// https://www.youtube.com/watch?v=MiPpQzW_ya0&t=32s
+
 // dotenvの読み込み設定
 require('dotenv').config();
 const Env = process.env;
