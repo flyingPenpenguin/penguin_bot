@@ -31,6 +31,25 @@ const dToken = Env.DISCORD_TOKEN;
 discordClient.login(dToken);
 
 /**
+ * function内で使用する定数
+ */
+// 週の拠点参加日(4日)のindex no
+const dayNumbers = [
+    1,
+    2,
+    3,
+    4,
+];
+
+// 参加オプション
+const attendanceOptions = [
+    '参加',
+    '不参加',
+    '遅刻',
+    '保留',
+];
+
+/**
  * ユーザーの発言に対しての処理
  * TODO : メッセージをpickupするチャンネルの制限
  */
@@ -42,33 +61,117 @@ discordClient.on('message', async msg => {
     if (msg.content.startsWith('拠点')) {
 
         // メッセージを配列化
+        let msgContent = msg.content.split('　');
 
-        // switch文
+        // '拠点'の後にスペースが入っていなければ終了
+        if (msgContent[0] != '拠点') return;
 
-        // 最初の拠点を除いて
-        // 1. 文字列で始まる場合
+        // 全入力モードなのか曜日指定モードなのかを最初の入力で判定する
+        let firstItem = msgContent[1];
 
-            // 配列の長さが4あるか確認 || 早期退出
+        switch (true) {
+            /**
+             * 曜日指定モード
+             */
+            // 最初の入力が整数 && 1~4の間である
+            case (Number.isInteger(parseInt(firstItem)) && dayNumbers.includes(parseInt(firstItem))):
 
-            // 配列を展開したうえで、すべてが参加 ~ 保留に正規表現マッチしているかの確認 || 早期退出
+                // 先頭は拠点なので削除
+                msgContent.shift();
 
-            // google api client.authorize
+                // バリデーションエラーがあるか
+                let validationError = false;
 
-                // 4箇所書き換えfunctionの呼び出し
+                // 配列の長さが2か
+                if (msgContent.length !== 2) {
+                    validationError = true;
+                };
 
-        // 2. 数字で始まる場合
+                // 曜日番号
+                let dayNum = parseInt(msgContent[0]);
+                // 参加オプション
+                let attendanceInput = msgContent[1];
 
-            // 配列の長さが2か || 早期退出
+                // 一つは1~4
+                // 2つ目は参加 ~ 保留に正規表現マッチしているか
+                if (
+                    !dayNumbers.includes(dayNum) ||
+                    !attendanceOptions.includes(attendanceInput)
+                ) {
+                    validationError = true;
+                }
 
-            // 配列を展開したうえで
-            // 一つは1~4
-            // 2つ目は参加 ~ 保留に正規表現マッチしているか
+                // バリエーションエラーがある場合通知
+                if (validationError) {
+                    // 書式エラーの通知
+                    msg.channel.send(
+                        '書式にエラーがあるみたいです！・ｗ・\n' +
+                        '"拠点"につづけて①曜日番号、②参加オプションの順で入力してください・ｗ・\n' +
+                        '**曜日番号は半角数字、各要素の間は全角スペースを入れてください**・ｗ・\n' +
+                        '\n' +
+                        '```例) 拠点　2　不参加```\n' +
+                        '\n' +
+                        '[使用可能オプション]:\n' +
+                        '参加、不参加、遅刻、保留' +
+                        '\n' +
+                        // TODO : 曜日オプションを環境変数化
+                        '[曜日オプション]:\n' +
+                        '1 : 火曜日\n' +
+                        '2 : 木曜日\n' +
+                        '3 : 金曜日\n' +
+                        '4 : 日曜日\n'
+                    );
+                }
 
-            // google api client.authorize
+                // google api client.authorize
 
-                // 1箇所書き換えfunctionの呼び出し
+                    // 1箇所書き換えfunctionの呼び出し
 
-        msg.channel.send('こんぺん！・ｗ・');
+                break;
+
+            /**
+             * 全入力モード
+             */
+            // 最初の入力が文字列である
+            case typeof firstItem == 'string':
+
+                // 先頭は拠点なので削除
+                msgContent.shift();
+
+                // バリデーション用カウンター
+                let validationSucceed = 0;
+
+                // 拠点の後に続く文字列それぞれが参加オプションに登録されている文字列かのチェック
+                msgContent.forEach(function (element) {
+                    if (attendanceOptions.includes(element)) {
+                        validationSucceed++;
+                    }
+                });
+
+                // バリデーションでエラーがあれば処理終了
+                if (validationSucceed !== 4) {
+                    // 書式エラーの通知
+                    msg.channel.send(
+                        '書式にエラーがあるみたいです！・ｗ・\n' +
+                        '"拠点"につづけて参加可否をオプションの中から選んで曜日ごとに**4つすべて**入力してください・ｗ・\n' +
+                        '**各要素の間は全角スペースを入れてください**・ｗ・\n' +
+                        '\n' +
+                        '```　　　　　　1　　　2　　 3　　 4\n' +
+                        '例) 拠点　参加　不参加　保留　参加```\n' +
+                        '\n' +
+                        '[使用可能オプション]:\n' +
+                        '参加、不参加、遅刻、保留'
+                    );
+
+                    return;
+                }
+
+                // TODO
+                // google api呼び出し
+
+
+                break;
+        }
     }
 });
 
