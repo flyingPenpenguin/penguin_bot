@@ -39,7 +39,43 @@ discordClient.on('message', async msg => {
     if (msg.author.bot) return;
 
     // '拠点'で始まるメッセージをピック
-    if (msg.content.match(/^拠点/)) {
+    if (msg.content.startsWith('拠点')) {
+
+        // メッセージを配列化
+
+        // switch文
+
+        // 最初の拠点を除いて
+        // 1. 文字列で始まる場合
+
+            // 配列の長さが4あるか確認 || 早期退出
+
+            // 配列を展開したうえで、すべてが参加 ~ 保留に正規表現マッチしているかの確認 || 早期退出
+
+            // google api client.authorize
+
+                // 4箇所書き換えfunctionの呼び出し
+
+        // 2. 数字で始まる場合
+
+            // 配列の長さが2か || 早期退出
+
+            // 配列を展開したうえで
+            // 一つは1~4
+            // 2つ目は参加 ~ 保留に正規表現マッチしているか
+
+            // google api client.authorize
+
+                // 1箇所書き換えfunctionの呼び出し
+
         msg.channel.send('こんぺん！・ｗ・');
     }
 });
+
+
+// async function inputAttendance()
+// @param array
+
+
+// async function inputAttendanceSpecified()
+// @param array
