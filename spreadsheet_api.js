@@ -124,8 +124,20 @@ discordClient.on('message', async msg => {
                 }
 
                 // google api client.authorize
+                googleClient.authorize(function (err, tokens) {
 
-                    // 1箇所書き換えfunctionの呼び出し
+                    // エラー時
+                    if (err) {
+                        console.log(err);
+                        return;
+                    }
+
+                    // 接続完了
+                    console.log('Connected!');
+
+                    // 全入力functionの呼び出し
+                    inputAttendanceSpecified(googleClient, msgContent);
+                });
 
                 break;
 
@@ -166,9 +178,21 @@ discordClient.on('message', async msg => {
                     return;
                 }
 
-                // TODO
-                // google api呼び出し
+                // google api client.authorize
+                googleClient.authorize(function (err, tokens) {
 
+                    // エラー時
+                    if (err) {
+                        console.log(err);
+                        return;
+                    }
+
+                    // 接続完了
+                    console.log('Connected!');
+
+                    // 全入力functionの呼び出し
+                    inputAttendanceBatch(googleClient, msgContent);
+                });
 
                 break;
         }
@@ -176,8 +200,36 @@ discordClient.on('message', async msg => {
 });
 
 
-// async function inputAttendance()
-// @param array
+/**
+ * 拠点参加予定日すべてに一括入力する
+ */
+async function inputAttendanceBatch(gClient, uInput) {
+    // シートAPIの定義
+    const gsapi = google.sheets({
+        version:'v4',
+        auth: gClient
+    });
+
+    console.log(uInput);
+    let updateValues = [uInput];
+    console.log(updateValues);
+
+    // 書き換えオプション
+    const updateOptions = {
+        spreadsheetId: Env.TEST_SPREADSHEET_ID,
+        range: 'F5',
+        valueInputOption: 'USER_ENTERED',
+        resource: {
+            values: updateValues
+        },
+    };
+
+    // 書き換え実行
+    let res = await gsapi.spreadsheets.values.update(updateOptions);
+
+    // 結果をコンソールに出力
+    console.log(res);
+}
 
 
 // async function inputAttendanceSpecified()

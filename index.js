@@ -5,9 +5,21 @@
 require('dotenv').config();
 const Env = process.env;
 
+/**
+ * google api設定
+ */
+const {google} = require('googleapis');
+const keys     = require('./keys.json');
 
-
-
+// トークンの生成(Json Web Token)
+const client = new google.auth.JWT(
+    keys.client_email,
+    null,
+    keys.private_key,
+    [
+       'https://www.googleapis.com/auth/spreadsheets'
+    ]
+);
 
 client.authorize(function (err, tokens) {
 
