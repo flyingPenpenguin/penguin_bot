@@ -51,20 +51,26 @@ const attendanceOptions = [
 
 /**
  * ユーザーの発言に対しての処理
- * TODO : メッセージをpickupするチャンネルの制限
  */
 discordClient.on('message', async msg => {
     // bot自身の発言は無視
     if (msg.author.bot) return;
+    // 対象チャンネルでなければ無視
+    if (msg.channel.id != Env.DISCORD_NODE_NOTIFICATION_CHANNEL_ID) return;
 
-    console.log(msg.author.username);
-
+    // ログを残す
+    console.log(msg.author.username + 'さんが入力しました');
 
     // '拠点'で始まるメッセージをピック
     if (msg.content.startsWith('拠点')) {
 
         // メッセージを配列化
         let msgContent = msg.content.split('　');
+
+        // 半角スペースで入力したときのために
+        if (msgContent.length !== 5) {
+            msgContent = msg.content.split(' ');
+        }
 
         // '拠点'の後にスペースが入っていなければ終了
         if (msgContent[0] != '拠点') return;
@@ -110,7 +116,7 @@ discordClient.on('message', async msg => {
                     msg.channel.send(
                         '書式にエラーがあるみたいです！・ｗ・\n' +
                         '"拠点"につづけて①曜日番号、②参加オプションの順で入力してください・ｗ・\n' +
-                        '**曜日番号は半角数字、各要素の間は全角スペースを入れてください**・ｗ・\n' +
+                        '**曜日番号は半角数字、各要素の間のスペースは半角でも全角でも構いませんが、どちらかに統一してください**・ｗ・\n' +
                         '\n' +
                         '```例) 拠点　2　不参加```\n' +
                         '\n' +
@@ -169,7 +175,7 @@ discordClient.on('message', async msg => {
                     msg.channel.send(
                         '書式にエラーがあるみたいです！・ｗ・\n' +
                         '"拠点"につづけて参加可否をオプションの中から選んで曜日ごとに**4つすべて**入力してください・ｗ・\n' +
-                        '**各要素の間は全角スペースを入れてください**・ｗ・\n' +
+                        '**各要素の間のスペースは半角でも全角でも構いませんが、どちらかに統一してください**・ｗ・\n' +
                         '\n' +
                         '```　　　　　　1　　　2　　 3　　 4\n' +
                         '例) 拠点　参加　不参加　保留　参加```\n' +
