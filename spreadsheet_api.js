@@ -199,7 +199,6 @@ discordClient.on('message', async msg => {
     }
 });
 
-
 /**
  * 拠点参加予定日すべてに一括入力する
  */
@@ -210,14 +209,15 @@ async function inputAttendanceBatch(gClient, uInput) {
         auth: gClient
     });
 
-    console.log(uInput);
+    // リクエストに添うように配列化
     let updateValues = [uInput];
-    console.log(updateValues);
 
     // 書き換えオプション
     const updateOptions = {
+        // スプレッドシートのID(タブの名前ではない)
         spreadsheetId: Env.TEST_SPREADSHEET_ID,
-        range: 'F5',
+        // 書き込むタブ(シート)と位置の指定
+        range: Env.ATTENDANCE_SHEET_NAME + '!F5',
         valueInputOption: 'USER_ENTERED',
         resource: {
             values: updateValues
