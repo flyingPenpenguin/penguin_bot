@@ -12,7 +12,7 @@ const Env = process.env;
  * google api設定
  */
 const {google} = require('googleapis');
-const gKeys     = require('./keys.json');
+const gKeys     = require(Env.KEYS_JSON);
 
 // トークンの生成(Json Web Token)
 const googleClient = new google.auth.JWT(
@@ -244,7 +244,7 @@ async function inputAttendanceBatch(gsapi, uInput, startingNumber) {
     // 書き換えオプション
     const updateOptions = {
         // スプレッドシートのID(タブの名前ではない)
-        spreadsheetId: Env.TEST_SPREADSHEET_ID,
+        spreadsheetId: Env.TARGET_SPREADSHEET_ID,
         // 書き込むタブ(シート)と位置の指定
         range: Env.ATTENDANCE_SHEET_NAME + '!F' + startingNumber,
         valueInputOption: 'USER_ENTERED',
@@ -270,7 +270,7 @@ async function getStartingCellByUserId(gsapi, userName) {
      */
     // 家名取得のためのオプション
     const optForIndexing = {
-        spreadsheetId: Env.TEST_SPREADSHEET_ID,
+        spreadsheetId: Env.TARGET_SPREADSHEET_ID,
         range: Env.DISCORD_USER_NAME_SHEET_NAME + '!B5:C'
     };
 
@@ -294,7 +294,7 @@ async function getStartingCellByUserId(gsapi, userName) {
      */
     // 出欠確認シートは並びが変わっている場合があるため現在の並びを取得する
     const optForGettingStartingNumber = {
-        spreadsheetId: Env.TEST_SPREADSHEET_ID,
+        spreadsheetId: Env.TARGET_SPREADSHEET_ID,
         range: Env.ATTENDANCE_SHEET_NAME + '!B5:B'
     };
 
