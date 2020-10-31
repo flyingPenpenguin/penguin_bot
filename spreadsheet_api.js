@@ -74,7 +74,7 @@ discordClient.on('message', async msg => {
         let msgContent = msg.content.split('　');
 
         // 半角スペースで入力したときのために
-        if (msgContent.length !== 5) {
+        if (msgContent.length !== 5 && msgContent[0] != '拠点') {
             msgContent = msg.content.split(' ');
         }
 
