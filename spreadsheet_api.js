@@ -62,7 +62,7 @@ discordClient.on('message', async msg => {
     // bot自身の発言は無視
     if (msg.author.bot) return;
     // 対象チャンネルでなければ無視
-    if (msg.channel.id != Env.DISCORD_NODE_NOTIFICATION_CHANNEL_ID) return;
+    if (msg.channel.id != Env.DISCORD_ATTENCANCE_CHANNEL_ID) return;
 
     // ログを残す
     console.log(msg.author.username + 'さんが入力しました');
