@@ -61,6 +61,25 @@ Hi flyingPenpenguin! You've successfully authenticated, but GitHub does not prov
 [ penguin_bot]$ node ./notification.js
 ぺんぎんbotでログイン成功しました。
 
+// めちゃくちゃハマったところ
+// 何故か動かない。絶対動かない。
+[ penguin_bot]$ crontab -e
+* * * * * cd /home/flpenguin/penguin_bot && pkill -f ./spreadsheet_api.js && sleep 10 && node ./spreadsheet_api.js
+
+// crontabではコマンドのフルパスが必要とのこと！
+[ penguin_bot]$ which node
+/usr/bin/node
+
+// nodeコマンド・pkillコマンドをフルパスに書き換える
+[ penguin_bot]$ crontab -e
+* * * * * cd /home/flpenguin/penguin_bot && /usr/bin/pkill -f ./spreadsheet_api.js && sleep 10 && /usr/bin/node ./spreadsheet_api.js
+
+// cronが走ったことを確認
+[ penguin_bot]$ sudo tail /var/log/cron
+Oct 25 16:00:08 localhost crontab[4649]: (flpenguin) BEGIN EDIT (flpenguin)
+Oct 25 16:00:14 localhost crontab[4649]: (flpenguin) END EDIT (flpenguin)
+Oct 25 16:01:01 localhost crond[708]: (flpenguin) RELOAD (/var/spool/cron/flpenguin)
+Oct 25 16:01:01 localhost CROND[4672]: (flpenguin) CMD (cd /home/flpenguin/penguin_bot && pkill -f ./spreadsheet_api.js && sleep 10 && /usr/bin/node ./spreadsheet_api.js)
 
 
 
