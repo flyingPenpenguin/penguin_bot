@@ -78,11 +78,13 @@ discordClient.on('message', async msg => {
             msgContent = msg.content.split(' ');
         }
 
-        // '拠点'の後にスペースが入っていなければ終了
-        if (msgContent[0] != '拠点') return;
-
+        let firstItem = '';
         // 全入力モードなのか曜日指定モードなのかを最初の入力で判定する
-        let firstItem = msgContent[1];
+        if (msgContent[1] !== undefined) {
+            firstItem = msgContent[1];
+        } else {
+            firstItem = undefined;
+        }
 
         switch (true) {
             /**
@@ -90,6 +92,7 @@ discordClient.on('message', async msg => {
              */
             // 最初の入力が整数 && 1~4の間である
             case (Number.isInteger(parseInt(firstItem)) && dayNumbers.includes(parseInt(firstItem))):
+                console.log('曜日指定');
 
                 // 先頭は拠点なので削除
                 msgContent.shift();
@@ -161,6 +164,7 @@ discordClient.on('message', async msg => {
              */
             // 最初の入力が文字列である
             case typeof firstItem == 'string':
+                console.log('全入力');
 
                 // 先頭は拠点なので削除
                 msgContent.shift();
@@ -231,13 +235,14 @@ discordClient.on('message', async msg => {
 
             // 要するに書式が間違っているとき
             default:
+                console.log('書式確認');
+
                 // 書式エラーの通知
                 msg.channel.send(
                     '書式にエラーがあるみたいです！・ｗ・\n' +
                     '入力方法は下記の2通りです・ｗ・/\n' +
                     '\n' +
-                    '\n' +
-                    '1. 週のすべての日に対して参加登録を行う・ｗ・\n' +
+                    '**1. 週のすべての日に対して参加登録を行う・ｗ・**\n' +
                     '"拠点"につづけて参加可否をオプションの中から選んで曜日ごとに**4つすべて**入力してください・ｗ・\n' +
                     '**各要素の間のスペースは半角でも全角でも構いませんが、どちらかに統一してください**・ｗ・\n' +
                     '\n' +
@@ -248,8 +253,7 @@ discordClient.on('message', async msg => {
                     '参加、不参加、遅刻、保留\n' +
                     '\n' +
                     '\n' +
-                    '2. 週の特定の日に対して参加登録を行う・ｗ・\n' +
-                    '\n' +
+                    '**comming soon 2. 週の特定の日に対して参加登録を行う・ｗ・**\n' +
                     '\n' +
                     '"拠点"につづけて①曜日番号、②参加オプションの順で入力してください・ｗ・\n' +
                     '**曜日番号は半角数字、各要素の間のスペースは半角でも全角でも構いませんが、どちらかに統一してください**・ｗ・\n' +
