@@ -317,7 +317,7 @@ async function getStartingCellByUserId(gsapi, userName) {
     // 家名取得のためのオプション
     const optForIndexing = {
         spreadsheetId: Env.TARGET_SPREADSHEET_ID,
-        range: Env.DISCORD_USER_NAME_SHEET_NAME + '!B5:C'
+        range: Env.DISCORD_USER_NAME_SHEET_NAME + '!B2:C'
     };
 
     // 家名リストの元データ取得
