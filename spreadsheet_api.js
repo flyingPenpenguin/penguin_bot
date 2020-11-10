@@ -67,212 +67,218 @@ discordClient.on('message', async msg => {
     // ログを残す
     console.log(msg.author.username + 'さんが入力しました');
 
-    // '拠点'で始まるメッセージをピック
-    if (msg.content.startsWith('拠点')) {
+    // 現在使用停止中のメッセージ
+    const notificationMsg = 'ごめんなさい、現在ぺんぎんbotからの出欠登録受付を停止しています・ｗ・\n下記のリンク先にある連盟シートに直接出欠の書き込みをお願いします・ｗ・/\n' + Env.UNION_SPREADSHEET_URL;
 
-        // メッセージを配列化
-        let msgContent = msg.content.split('　');
+    // メッセージ送信
+    msg.channel.send(notificationMsg);
 
-        // 半角スペースで入力したときのために
-        if (msgContent.length !== 5 && msgContent[0] != '拠点') {
-            msgContent = msg.content.split(' ');
-        }
+    // // '拠点'で始まるメッセージをピック
+    // if (msg.content.startsWith('拠点')) {
 
-        let firstItem = '';
-        // 全入力モードなのか曜日指定モードなのかを最初の入力で判定する
-        if (msgContent[1] !== undefined) {
-            firstItem = msgContent[1];
-        } else {
-            firstItem = undefined;
-        }
+    //     // メッセージを配列化
+    //     let msgContent = msg.content.split('　');
 
-        switch (true) {
-            /**
-             * 曜日指定モード
-             */
-            // 最初の入力が整数 && 1~4の間である
-            case (Number.isInteger(parseInt(firstItem)) && dayNumbers.includes(parseInt(firstItem))):
-                console.log('曜日指定');
+    //     // 半角スペースで入力したときのために
+    //     if (msgContent.length !== 5 && msgContent[0] != '拠点') {
+    //         msgContent = msg.content.split(' ');
+    //     }
 
-                // 先頭は拠点なので削除
-                msgContent.shift();
+    //     let firstItem = '';
+    //     // 全入力モードなのか曜日指定モードなのかを最初の入力で判定する
+    //     if (msgContent[1] !== undefined) {
+    //         firstItem = msgContent[1];
+    //     } else {
+    //         firstItem = undefined;
+    //     }
 
-                // バリデーションエラーがあるか
-                let validationError = false;
+    //     switch (true) {
+    //         /**
+    //          * 曜日指定モード
+    //          */
+    //         // 最初の入力が整数 && 1~4の間である
+    //         case (Number.isInteger(parseInt(firstItem)) && dayNumbers.includes(parseInt(firstItem))):
+    //             console.log('曜日指定');
 
-                // 配列の長さが2か
-                if (msgContent.length !== 2) {
-                    validationError = true;
-                };
+    //             // 先頭は拠点なので削除
+    //             msgContent.shift();
 
-                // 曜日番号
-                let dayNum = parseInt(msgContent[0]);
-                // 参加オプション
-                let attendanceInput = msgContent[1];
+    //             // バリデーションエラーがあるか
+    //             let validationError = false;
 
-                // 一つは1~4
-                // 2つ目は参加 ~ 保留に正規表現マッチしているか
-                if (
-                    !dayNumbers.includes(dayNum) ||
-                    !attendanceOptions.includes(attendanceInput)
-                ) {
-                    validationError = true;
-                }
+    //             // 配列の長さが2か
+    //             if (msgContent.length !== 2) {
+    //                 validationError = true;
+    //             };
 
-                // バリエーションエラーがある場合通知
-                if (validationError) {
-                    // 書式エラーの通知
-                    msg.channel.send(
-                        '書式にエラーがあるみたいです！・ｗ・\n' +
-                        '"拠点"につづけて①曜日番号、②参加オプションの順で入力してください・ｗ・\n' +
-                        '**曜日番号は半角数字、各要素の間のスペースは半角でも全角でも構いませんが、どちらかに統一してください**・ｗ・\n' +
-                        '\n' +
-                        '```例) 拠点　2　不参加```\n' +
-                        '\n' +
-                        '[使用可能オプション]:\n' +
-                        '参加、不参加、遅刻、保留' +
-                        '\n' +
-                        // TODO : 曜日オプションを環境変数化
-                        '[曜日オプション]:\n' +
-                        '1 : 火曜日\n' +
-                        '2 : 木曜日\n' +
-                        '3 : 金曜日\n' +
-                        '4 : 日曜日\n'
-                    );
-                }
+    //             // 曜日番号
+    //             let dayNum = parseInt(msgContent[0]);
+    //             // 参加オプション
+    //             let attendanceInput = msgContent[1];
 
-                // google api client.authorize
-                googleClient.authorize(function (err, tokens) {
+    //             // 一つは1~4
+    //             // 2つ目は参加 ~ 保留に正規表現マッチしているか
+    //             if (
+    //                 !dayNumbers.includes(dayNum) ||
+    //                 !attendanceOptions.includes(attendanceInput)
+    //             ) {
+    //                 validationError = true;
+    //             }
 
-                    // エラー時
-                    if (err) {
-                        console.log(err);
-                        return;
-                    }
+    //             // バリエーションエラーがある場合通知
+    //             if (validationError) {
+    //                 // 書式エラーの通知
+    //                 msg.channel.send(
+    //                     '書式にエラーがあるみたいです！・ｗ・\n' +
+    //                     '"拠点"につづけて①曜日番号、②参加オプションの順で入力してください・ｗ・\n' +
+    //                     '**曜日番号は半角数字、各要素の間のスペースは半角でも全角でも構いませんが、どちらかに統一してください**・ｗ・\n' +
+    //                     '\n' +
+    //                     '```例) 拠点　2　不参加```\n' +
+    //                     '\n' +
+    //                     '[使用可能オプション]:\n' +
+    //                     '参加、不参加、遅刻、保留' +
+    //                     '\n' +
+    //                     // TODO : 曜日オプションを環境変数化
+    //                     '[曜日オプション]:\n' +
+    //                     '1 : 火曜日\n' +
+    //                     '2 : 木曜日\n' +
+    //                     '3 : 金曜日\n' +
+    //                     '4 : 日曜日\n'
+    //                 );
+    //             }
 
-                    // 接続完了
-                    console.log('Connected!');
+    //             // google api client.authorize
+    //             googleClient.authorize(function (err, tokens) {
 
-                    // 全入力functionの呼び出し
-                    inputAttendanceSpecified(googleClient, msgContent);
-                });
+    //                 // エラー時
+    //                 if (err) {
+    //                     console.log(err);
+    //                     return;
+    //                 }
 
-                break; // case 1おわり
+    //                 // 接続完了
+    //                 console.log('Connected!');
 
-            /**
-             * 全入力モード
-             */
-            // 最初の入力が文字列である
-            case typeof firstItem == 'string':
-                console.log('全入力');
+    //                 // 全入力functionの呼び出し
+    //                 inputAttendanceSpecified(googleClient, msgContent);
+    //             });
 
-                // 先頭は拠点なので削除
-                msgContent.shift();
+    //             break; // case 1おわり
 
-                // バリデーション用カウンター
-                let validationSucceed = 0;
+    //         /**
+    //          * 全入力モード
+    //          */
+    //         // 最初の入力が文字列である
+    //         case typeof firstItem == 'string':
+    //             console.log('全入力');
 
-                // 拠点の後に続く文字列それぞれが参加オプションに登録されている文字列かのチェック
-                msgContent.forEach(function (element) {
-                    if (attendanceOptions.includes(element)) {
-                        validationSucceed++;
-                    }
-                });
+    //             // 先頭は拠点なので削除
+    //             msgContent.shift();
 
-                // バリデーションでエラーがあれば処理終了
-                if (validationSucceed !== 4) {
-                    // 書式エラーの通知
-                    msg.channel.send(
-                        '書式にエラーがあるみたいです！・ｗ・\n' +
-                        '"拠点"につづけて参加可否をオプションの中から選んで曜日ごとに**4つすべて**入力してください・ｗ・\n' +
-                        '**各要素の間のスペースは半角でも全角でも構いませんが、どちらかに統一してください**・ｗ・\n' +
-                        '\n' +
-                        '```　　　　　　1　　　2　　 3　　 4\n' +
-                        '例) 拠点　参加　不参加　保留　参加```\n' +
-                        '\n' +
-                        '[使用可能オプション]:\n' +
-                        '参加、不参加、遅刻、保留'
-                    );
+    //             // バリデーション用カウンター
+    //             let validationSucceed = 0;
 
-                    return;
-                }
+    //             // 拠点の後に続く文字列それぞれが参加オプションに登録されている文字列かのチェック
+    //             msgContent.forEach(function (element) {
+    //                 if (attendanceOptions.includes(element)) {
+    //                     validationSucceed++;
+    //                 }
+    //             });
 
-                // google api client.authorize
-                googleClient.authorize(function (err, tokens) {
+    //             // バリデーションでエラーがあれば処理終了
+    //             if (validationSucceed !== 4) {
+    //                 // 書式エラーの通知
+    //                 msg.channel.send(
+    //                     '書式にエラーがあるみたいです！・ｗ・\n' +
+    //                     '"拠点"につづけて参加可否をオプションの中から選んで曜日ごとに**4つすべて**入力してください・ｗ・\n' +
+    //                     '**各要素の間のスペースは半角でも全角でも構いませんが、どちらかに統一してください**・ｗ・\n' +
+    //                     '\n' +
+    //                     '```　　　　　　1　　　2　　 3　　 4\n' +
+    //                     '例) 拠点　参加　不参加　保留　参加```\n' +
+    //                     '\n' +
+    //                     '[使用可能オプション]:\n' +
+    //                     '参加、不参加、遅刻、保留'
+    //                 );
 
-                    // エラー時
-                    if (err) {
-                        console.log(err);
-                        return;
-                    }
+    //                 return;
+    //             }
 
-                    // シートAPIの定義
-                    const gsapi = google.sheets({
-                        version:'v4',
-                        auth: googleClient
-                    });
+    //             // google api client.authorize
+    //             googleClient.authorize(function (err, tokens) {
 
-                    // 接続完了
-                    console.log('Connected!');
+    //                 // エラー時
+    //                 if (err) {
+    //                     console.log(err);
+    //                     return;
+    //                 }
 
-                    // 書き込み位置取得function
-                    const startingNumPromise = Promise.resolve(getStartingCellByUserId(gsapi, msg.author.username));
+    //                 // シートAPIの定義
+    //                 const gsapi = google.sheets({
+    //                     version:'v4',
+    //                     auth: googleClient
+    //                 });
 
-                    // 書き込み開始位置取得が成功したら書き込みを行う(例外処理ないけどね！)
-                    startingNumPromise.then((startingNumber) => {
-                        // 全入力functionの呼び出し
-                        inputAttendanceBatch(gsapi, msgContent, startingNumber);
+    //                 // 接続完了
+    //                 console.log('Connected!');
 
-                        msg.channel.send(
-                            msg.author.username + 'さん、参加登録を受け付けました！・ｗ・\n' +
-                            '記入ありがとですー・ｗ・/'
-                        );
-                    });
+    //                 // 書き込み位置取得function
+    //                 const startingNumPromise = Promise.resolve(getStartingCellByUserId(gsapi, msg.author.username));
 
-                });
+    //                 // 書き込み開始位置取得が成功したら書き込みを行う(例外処理ないけどね！)
+    //                 startingNumPromise.then((startingNumber) => {
+    //                     // 全入力functionの呼び出し
+    //                     inputAttendanceBatch(gsapi, msgContent, startingNumber);
 
-                break; // case 2おわり
-        } // switchおわり
+    //                     msg.channel.send(
+    //                         msg.author.username + 'さん、参加登録を受け付けました！・ｗ・\n' +
+    //                         '記入ありがとですー・ｗ・/'
+    //                     );
+    //                 });
 
-    // '拠点'以外からメッセージが始まる場合
-    } else {
+    //             });
 
-        console.log('書式確認');
+    //             break; // case 2おわり
+    //     } // switchおわり
 
-        // 書式エラーの通知
-        msg.channel.send(
-            '書式にエラーがあるみたいです！・ｗ・\n' +
-            '入力方法は下記の2通りです・ｗ・/\n' +
-            '\n' +
-            '**1. 週のすべての日に対して参加登録を行う・ｗ・**\n' +
-            '"拠点"につづけて参加可否をオプションの中から選んで曜日ごとに**4つすべて**入力してください・ｗ・\n' +
-            '**各要素の間のスペースは半角でも全角でも構いませんが、どちらかに統一してください**・ｗ・\n' +
-            '\n' +
-            '```　　　　　　1　　　2　　 3　　 4\n' +
-            '例) 拠点　参加　不参加　保留　参加```\n' +
-            '\n' +
-            '[使用可能オプション]:\n' +
-            '参加、不参加、遅刻、保留\n' +
-            '\n' +
-            '\n' +
-            '**comming soon 2. 週の特定の日に対して参加登録を行う・ｗ・**\n' +
-            '\n' +
-            '"拠点"につづけて①曜日番号、②参加オプションの順で入力してください・ｗ・\n' +
-            '**曜日番号は半角数字、各要素の間のスペースは半角でも全角でも構いませんが、どちらかに統一してください**・ｗ・\n' +
-            '\n' +
-            '```例) 拠点　2　不参加```\n' +
-            '\n' +
-            '[使用可能オプション]:\n' +
-            '参加、不参加、遅刻、保留' +
-            '\n' +
-            // TODO : 曜日オプションを環境変数化
-            '[曜日オプション]:\n' +
-            '1 : 火曜日\n' +
-            '2 : 木曜日\n' +
-            '3 : 金曜日\n' +
-            '4 : 日曜日\n'
-        );
-    } // switchおわり
+    // // '拠点'以外からメッセージが始まる場合
+    // } else {
+
+    //     console.log('書式確認');
+
+    //     // 書式エラーの通知
+    //     msg.channel.send(
+    //         '書式にエラーがあるみたいです！・ｗ・\n' +
+    //         '入力方法は下記の2通りです・ｗ・/\n' +
+    //         '\n' +
+    //         '**1. 週のすべての日に対して参加登録を行う・ｗ・**\n' +
+    //         '"拠点"につづけて参加可否をオプションの中から選んで曜日ごとに**4つすべて**入力してください・ｗ・\n' +
+    //         '**各要素の間のスペースは半角でも全角でも構いませんが、どちらかに統一してください**・ｗ・\n' +
+    //         '\n' +
+    //         '```　　　　　　1　　　2　　 3　　 4\n' +
+    //         '例) 拠点　参加　不参加　保留　参加```\n' +
+    //         '\n' +
+    //         '[使用可能オプション]:\n' +
+    //         '参加、不参加、遅刻、保留\n' +
+    //         '\n' +
+    //         '\n' +
+    //         '**comming soon 2. 週の特定の日に対して参加登録を行う・ｗ・**\n' +
+    //         '\n' +
+    //         '"拠点"につづけて①曜日番号、②参加オプションの順で入力してください・ｗ・\n' +
+    //         '**曜日番号は半角数字、各要素の間のスペースは半角でも全角でも構いませんが、どちらかに統一してください**・ｗ・\n' +
+    //         '\n' +
+    //         '```例) 拠点　2　不参加```\n' +
+    //         '\n' +
+    //         '[使用可能オプション]:\n' +
+    //         '参加、不参加、遅刻、保留' +
+    //         '\n' +
+    //         // TODO : 曜日オプションを環境変数化
+    //         '[曜日オプション]:\n' +
+    //         '1 : 火曜日\n' +
+    //         '2 : 木曜日\n' +
+    //         '3 : 金曜日\n' +
+    //         '4 : 日曜日\n'
+    //     );
+    // } // switchおわり
 });
 
 /**
