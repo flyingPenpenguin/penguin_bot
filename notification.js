@@ -14,6 +14,9 @@ const client = new Discord.Client();
 // トークン
 const token = Env.DISCORD_TOKEN;
 
+// 実際にチャンネルに通知するメッセージ
+const notificationMsg = '@everyone\n本日は拠点戦です！・ｗ・\n出欠シートへの記入がまだの方は下記の連盟シートへ出欠の記入よろしくお願いします・ｗ・/\n' + Env.UNION_SPREADSHEET_URL;
+
 /**
  * 処理を行う
  */
@@ -36,5 +39,5 @@ client.on('ready', () => {
  * ログイン >> 通知 >> ログアウト
  */
 async function sendNotification() {
-    return await client.channels.cache.get(Env.DISCORD_NODE_NOTIFICATION_CHANNEL_ID).send('@everyone\n本日は拠点戦です！・ｗ・\n出欠シートへの記入がまだの方は記入よろしくお願いします・ｗ・/');
+    return await client.channels.cache.get(Env.DISCORD_NODE_NOTIFICATION_CHANNEL_ID).send(notificationMsg);
 }
